@@ -3,14 +3,91 @@ package com.yullg.util.android.boot.hw
 import com.yullg.util.android.res.StringArrayItem
 import com.yullg.util.android.res.StringItem
 import com.yullg.util.android.res.update
+import com.yullg.util.excel.ExcelReader
 import java.io.File
 import java.util.*
 
 fun main(args: Array<String>) {
-    insertOrUpdates()
+    insertOrUpdatesFromExcel()
     println("------- over ------")
 }
 
+/**
+ * 单次添加（读取Excel）
+ */
+private fun insertOrUpdatesFromExcel() =
+    ExcelReader(File("D:\\Workspace\\huawo\\other\\translate\\IOS多语言翻译.xlsx")).use { reader ->
+        // 项目模块位置
+        val dir = StringResourceDir.INTERACTION
+        // 字符资源名称
+        val name = "name"
+        // 工作表索引
+        val sheetIndex = 0
+        // 行索引
+        val rowIndex = 1
+        // 默认语言
+        val defValue = reader.readString(sheetIndex, rowIndex, 0)
+        // 阿拉伯语
+        val arValue = reader.readString(sheetIndex, rowIndex, 1)
+        // 孟加拉语
+        val bnValue = reader.readString(sheetIndex, rowIndex, 2)
+        // 捷克语
+        val csValue = reader.readString(sheetIndex, rowIndex, 3)
+        // 德语
+        val deValue = reader.readString(sheetIndex, rowIndex, 4)
+        // 西班牙语
+        val esValue = reader.readString(sheetIndex, rowIndex, 5)
+        // 法语
+        val frValue = reader.readString(sheetIndex, rowIndex, 6)
+        // 印地语
+        val hiValue = reader.readString(sheetIndex, rowIndex, 7)
+        // 印度尼西亚语
+        val inValue = reader.readString(sheetIndex, rowIndex, 8)
+        // 意大利语
+        val itValue = reader.readString(sheetIndex, rowIndex, 9)
+        // 韩语
+        val koValue = reader.readString(sheetIndex, rowIndex, 10)
+        // 波兰语
+        val plValue = reader.readString(sheetIndex, rowIndex, 11)
+        // 葡萄牙语
+        val ptValue = reader.readString(sheetIndex, rowIndex, 12)
+        // 俄语
+        val ruValue = reader.readString(sheetIndex, rowIndex, 13)
+        // 泰语
+        val thValue = reader.readString(sheetIndex, rowIndex, 14)
+        // 土耳其语
+        val trValue = reader.readString(sheetIndex, rowIndex, 15)
+        // 越南语
+        val viValue = reader.readString(sheetIndex, rowIndex, 16)
+        // 简体中文
+        val zhValue = reader.readString(sheetIndex, rowIndex, 17)
+        // 繁体中文
+        val zhRHKValue = reader.readString(sheetIndex, rowIndex, 18)
+        /*-----------------------------------------------------------*/
+        insertOrUpdate(dir, StringResourceLanguage.DEF, name, defValue)
+        insertOrUpdate(dir, StringResourceLanguage.AR, name, arValue)
+        insertOrUpdate(dir, StringResourceLanguage.BN, name, bnValue)
+        insertOrUpdate(dir, StringResourceLanguage.CS, name, csValue)
+        insertOrUpdate(dir, StringResourceLanguage.DE, name, deValue)
+        insertOrUpdate(dir, StringResourceLanguage.ES, name, esValue)
+        insertOrUpdate(dir, StringResourceLanguage.FR, name, frValue)
+        insertOrUpdate(dir, StringResourceLanguage.HI, name, hiValue)
+        insertOrUpdate(dir, StringResourceLanguage.IN, name, inValue)
+        insertOrUpdate(dir, StringResourceLanguage.IT, name, itValue)
+        insertOrUpdate(dir, StringResourceLanguage.KO, name, koValue)
+        insertOrUpdate(dir, StringResourceLanguage.PL, name, plValue)
+        insertOrUpdate(dir, StringResourceLanguage.PT, name, ptValue)
+        insertOrUpdate(dir, StringResourceLanguage.RU, name, ruValue)
+        insertOrUpdate(dir, StringResourceLanguage.TH, name, thValue)
+        insertOrUpdate(dir, StringResourceLanguage.TR, name, trValue)
+        insertOrUpdate(dir, StringResourceLanguage.VI, name, viValue)
+        insertOrUpdate(dir, StringResourceLanguage.ZH, name, zhValue)
+        insertOrUpdate(dir, StringResourceLanguage.ZH_RHK, name, zhRHKValue)
+    }
+
+/**
+ * 单次添加（手动复制）
+ */
 private fun insertOrUpdates() {
     // 项目模块位置
     val dir = StringResourceDir.INTERACTION
