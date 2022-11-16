@@ -10,7 +10,7 @@ import javax.xml.transform.TransformerFactory
 import javax.xml.transform.dom.DOMSource
 import javax.xml.transform.stream.StreamResult
 
-fun read(file: File): List<StringResource> {
+fun read(language: StringResourceLanguage, file: File): List<StringResource> {
     val result = arrayListOf<StringResource>()
     val documentBuilder = DocumentBuilderFactory.newInstance().apply {
         isIgnoringComments = true
@@ -20,8 +20,10 @@ fun read(file: File): List<StringResource> {
     for (index in 0 until stringNodeList.length) {
         val element = stringNodeList.item(index) as Element
         result.add(
-            StringItem(
-                element.getAttribute("name").trim(), (element.textContent ?: "").trim()
+            SimpleStringResource(
+                language,
+                element.getAttribute("name").trim(),
+                (element.textContent ?: "").trim()
             )
         )
     }
@@ -35,10 +37,47 @@ fun read(file: File): List<StringResource> {
             itemValueList.add((itemElement.textContent ?: "").trim())
         }
         result.add(
-            StringArrayItem(
-                element.getAttribute("name").trim(), itemValueList.toTypedArray()
+            ArrayStringResource(
+                language,
+                element.getAttribute("name").trim(),
+                itemValueList.toTypedArray()
             )
         )
+    }
+    return result
+}
+
+fun reads(lanAndFilePairList: List<Pair<StringResourceLanguage, File>>): List<List<StringResource>> {
+    val result = arrayListOf<List<StringResource>>()
+    if (lanAndFilePairList.isNotEmpty()) {
+        val lanAndStringResourceListPairList = arrayListOf<Pair<StringResourceLanguage, List<StringResource>>>()
+        for (lanAndFilePair in lanAndFilePairList) {
+            val stringResourceList = read(lanAndFilePair.first, lanAndFilePair.second)
+            lanAndStringResourceListPairList.add(Pair(lanAndFilePair.first, stringResourceList))
+        }
+        val firstLanAndStringResourceListPair = lanAndStringResourceListPairList.removeFirst()
+        for (firstStringResource in firstLanAndStringResourceListPair.second) {
+            val stringResourceList = arrayListOf(firstStringResource)
+            for (lanAndStringResourceListPair in lanAndStringResourceListPairList) {
+                var found = false
+                for (stringResource in lanAndStringResourceListPair.second) {
+                    if (firstStringResource.name == stringResource.name) {
+                        stringResourceList.add(stringResource)
+                        found = true
+                        break
+                    }
+                }
+                if (!found) {
+                    stringResourceList.add(
+                        NoneStringResource(
+                            lanAndStringResourceListPair.first,
+                            firstStringResource.name
+                        )
+                    )
+                }
+            }
+            result.add(stringResourceList)
+        }
     }
     return result
 }
@@ -49,13 +88,13 @@ fun write(file: File, stringResourceList: List<StringResource>) {
     val rootElement = document.createElement("resources")
     for (stringResource in stringResourceList) {
         when (stringResource) {
-            is StringItem -> {
+            is SimpleStringResource -> {
                 val stringElement = document.createElement("string")
                 stringElement.setAttribute("name", stringResource.name)
                 stringElement.textContent = stringResource.value
                 rootElement.appendChild(stringElement)
             }
-            is StringArrayItem -> {
+            is ArrayStringResource -> {
                 val stringArrayElement = document.createElement("string-array")
                 stringArrayElement.setAttribute("name", stringResource.name)
                 stringResource.values.forEach {
@@ -79,13 +118,12 @@ fun write(file: File, stringResourceList: List<StringResource>) {
 fun update(file: File, stringResourceList: List<StringResource>) {
     val documentBuilder = DocumentBuilderFactory.newInstance().apply {
         isIgnoringComments = true
-        isIgnoringElementContentWhitespace = true
     }.newDocumentBuilder()
     val document = documentBuilder.parse(file)
     val rootElement = document.documentElement
     for (stringResource in stringResourceList) {
         when (stringResource) {
-            is StringItem -> {
+            is SimpleStringResource -> {
                 val stringElement = document.createElement("string")
                 stringElement.setAttribute("name", stringResource.name)
                 stringElement.textContent = stringResource.value
@@ -96,7 +134,7 @@ fun update(file: File, stringResourceList: List<StringResource>) {
                     rootElement.appendChild(stringElement)
                 }
             }
-            is StringArrayItem -> {
+            is ArrayStringResource -> {
                 val stringArrayElement = document.createElement("string-array")
                 stringArrayElement.setAttribute("name", stringResource.name)
                 stringResource.values.forEach {

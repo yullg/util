@@ -8,14 +8,18 @@ import java.io.File
 
 class ExcelReader(private val file: File) : AutoCloseable {
 
-    private val workbook: Workbook
+    private val workbook: Workbook = WorkbookFactory.create(file, null, true)
 
-    init {
-        this.workbook = WorkbookFactory.create(file, null, true)
+    fun getFirstRowNum(sheetIndex: Int): Int {
+        return workbook.getSheetAt(sheetIndex).firstRowNum
     }
 
-    fun readString(sheetIndex: Int, rowIndex: Int, cellIndex: Int): String {
-        val cell = workbook.getSheetAt(sheetIndex).getRow(rowIndex).getCell(cellIndex)
+    fun getLastRowNum(sheetIndex: Int): Int {
+        return workbook.getSheetAt(sheetIndex).lastRowNum
+    }
+
+    fun readString(sheetIndex: Int, rowIndex: Int, columnIndex: Int): String? {
+        val cell = workbook.getSheetAt(sheetIndex).getRow(rowIndex)?.getCell(columnIndex) ?: return null
         return when (cell.cellType) {
             CellType.BOOLEAN -> cell.booleanCellValue.toString()
             CellType.NUMERIC -> if (DateUtil.isCellDateFormatted(cell)) {
