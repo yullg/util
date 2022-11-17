@@ -286,7 +286,7 @@ private fun generateExcelDataForExport(stringResourceListList: List<List<StringR
                 // 1：分解这一行的所有列数据，产生一个二维列表，一维表示原始列，二维表示每个原始列分解出来的行
                 val rowOriginData = arrayListOf<List<SimpleStringResource>>()
                 for (stringResource in stringResourceList) {
-                    rowOriginData.add((stringResource as ArrayStringResource).toSimpleStringResourceArray())
+                    rowOriginData.add((stringResource as ArrayStringResource).toSimpleStringResourceList())
                 }
                 // 2：将二维列表转换成Excel二维数据，假设所有第二维度中具有相同数量的数据
                 for (rowIndex in 0 until rowOriginData.first().size) {

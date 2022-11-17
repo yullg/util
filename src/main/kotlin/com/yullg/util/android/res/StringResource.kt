@@ -44,7 +44,7 @@ data class ArrayStringResource(
 
 }
 
-fun ArrayStringResource.toSimpleStringResourceArray(): List<SimpleStringResource> {
+fun ArrayStringResource.toSimpleStringResourceList(): List<SimpleStringResource> {
     val result = arrayListOf<SimpleStringResource>()
     for ((index, value) in values.withIndex()) {
         result.add(SimpleStringResource(language, "$name#$index", value))
