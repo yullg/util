@@ -15,15 +15,15 @@ fun main(args: Array<String>) {
  * 单次添加（读取Excel）
  */
 private fun insertOrUpdatesFromExcel() =
-    ExcelReader(File("C:\\Users\\YU\\Downloads\\iOS翻译(2)(1)(1).xlsx")).use { reader ->
+    ExcelReader(File("E:\\iOS.xlsx")).use { reader ->
         // 项目模块位置
-        val dir = StringResourceDir.APP
+        val dir = ResourceDirectory.INTERACTION
         // 字符资源名称
-        val name = "app_main_workouts_gps_total_calories"
+        val name = "interaction_card_list_add_text"
         // 工作表索引
         val sheetIndex = 0
         // 行索引
-        val rowIndex = 567
+        val rowIndex = 1356
         // 默认语言
         val defValue = reader.readString(sheetIndex, rowIndex, 3)!!
         // 阿拉伯语
@@ -95,7 +95,7 @@ private fun insertOrUpdatesFromExcel() =
  */
 private fun insertOrUpdates() {
     // 项目模块位置
-    val dir = StringResourceDir.INTERACTION
+    val dir = ResourceDirectory.INTERACTION
     // 字符资源名称
     val name = "name"
     // 默认语言
@@ -169,7 +169,7 @@ private fun insertOrUpdates() {
  */
 private fun importFromExcel() = ExcelReader(File("E:\\Android翻译-翻译.xlsx")).use { reader ->
     // 导入的模块
-    val dir = StringResourceDir.APP_UFIT
+    val dir = ResourceDirectory.APP_UFIT
     // 导入的语言
     val lan = StringResourceLanguage.FA
     // 导入基于的参考语言
@@ -226,18 +226,37 @@ private fun exportToExcel() {
     val excelFile = File("E:\\Android翻译.xlsx")
     // 需要导出的模块
     val dirArr = arrayOf(
-        StringResourceDir.SERVICE,
-        StringResourceDir.INTERACTION,
-        StringResourceDir.APP,
-        StringResourceDir.APP_UFIT
+        ResourceDirectory.SERVICE,
+        ResourceDirectory.INTERACTION,
+        ResourceDirectory.APP,
+        ResourceDirectory.APP_UFIT
     )
     // 需要导出的语言
     val lanArr = arrayOf(
         StringResourceLanguage.DEF,
-        StringResourceLanguage.ZH
+        StringResourceLanguage.AR,
+        StringResourceLanguage.BN,
+        StringResourceLanguage.CS,
+        StringResourceLanguage.DE,
+        StringResourceLanguage.ES,
+        StringResourceLanguage.FR,
+        StringResourceLanguage.HI,
+        StringResourceLanguage.IN,
+        StringResourceLanguage.IT,
+        StringResourceLanguage.PL,
+        StringResourceLanguage.PT,
+        StringResourceLanguage.RU,
+        StringResourceLanguage.TH,
+        StringResourceLanguage.TR,
+        StringResourceLanguage.VI,
+        StringResourceLanguage.ZH,
+        StringResourceLanguage.ZH_RHK,
+        StringResourceLanguage.KM,
+        StringResourceLanguage.IW,
+        StringResourceLanguage.FA
     )
     // 准备数据
-    val data = arrayListOf<Pair<StringResourceDir, List<List<StringResource>>>>()
+    val data = arrayListOf<Pair<ResourceDirectory, List<List<StringResource>>>>()
     dirArr.forEach { dir ->
         val lanAndFilePairList = mutableListOf<Pair<StringResourceLanguage, File>>()
         lanArr.forEach { lan ->
@@ -312,24 +331,17 @@ private fun generateExcelDataForExport(stringResourceListList: List<List<StringR
     return result
 }
 
-private fun insertOrUpdate(dir: StringResourceDir, lan: StringResourceLanguage, name: String, value: String) {
+private fun insertOrUpdate(dir: ResourceDirectory, lan: StringResourceLanguage, name: String, value: String) {
     val file = getStringResourceFile(dir, lan)
     update(file, Collections.singletonList(SimpleStringResource(lan, name, value)))
 }
 
-private fun insertOrUpdate(dir: StringResourceDir, lan: StringResourceLanguage, name: String, values: Array<String>) {
+private fun insertOrUpdate(dir: ResourceDirectory, lan: StringResourceLanguage, name: String, values: Array<String>) {
     val file = getStringResourceFile(dir, lan)
     update(file, Collections.singletonList(ArrayStringResource(lan, name, values)))
 }
 
-private fun getStringResourceFile(dir: StringResourceDir, lan: StringResourceLanguage): File {
+private fun getStringResourceFile(dir: ResourceDirectory, lan: StringResourceLanguage): File {
     val suffix = if (null == lan.code) "" else "-${lan.code}"
     return File(dir.file, "values$suffix\\strings.xml")
-}
-
-enum class StringResourceDir(val file: File) {
-    SERVICE(File("D:\\Workspace\\huawo\\android\\hawofit\\module-service\\src\\main\\res")),
-    INTERACTION(File("D:\\Workspace\\huawo\\android\\hawofit\\module-interaction\\src\\main\\res")),
-    APP(File("D:\\Workspace\\huawo\\android\\hawofit\\app\\src\\main\\res")),
-    APP_UFIT(File("D:\\Workspace\\huawo\\android\\hawofit\\app-ufit\\src\\main\\res"))
 }
