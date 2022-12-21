@@ -7,7 +7,7 @@ import java.io.File
 import java.util.*
 
 fun main(args: Array<String>) {
-    insertOrUpdatesFromExcel()
+    updateFromExcel()
     println("------- over ------")
 }
 
@@ -17,13 +17,13 @@ fun main(args: Array<String>) {
 private fun insertOrUpdatesFromExcel() =
     ExcelReader(File("E:\\iOS.xlsx")).use { reader ->
         // 项目模块位置
-        val dir = ResourceDirectory.INTERACTION
+        val dir = ResourceDirectory.SERVICE
         // 字符资源名称
-        val name = "interaction_card_list_add_text"
+        val name = "base_remote_code_network_unavailable"
         // 工作表索引
         val sheetIndex = 0
         // 行索引
-        val rowIndex = 1356
+        val rowIndex = 1104
         // 默认语言
         val defValue = reader.readString(sheetIndex, rowIndex, 3)!!
         // 阿拉伯语
@@ -216,6 +216,68 @@ private fun importFromExcel() = ExcelReader(File("E:\\Android翻译-翻译.xlsx"
         }
     }
     write(getStringResourceFile(dir, lan), data)
+}
+
+private fun updateFromExcel() = ExcelReader(File("E:\\波斯Copy of Android-Finalized(1).xlsx")).use { reader ->
+    // 更新的模块
+    val dir = ResourceDirectory.APP_UFIT
+    // 更新的语言
+    val lan = StringResourceLanguage.FA
+    // 工作表索引
+    val sheetIndex = 3
+    // name列索引
+    val nameColumnIndex = 0
+    // value列索引
+    val valueColumnIndex = 21
+    // Excel数据起始行
+    val excelStartRowIndex = 1
+    // Excel数据结束行
+    val excelEndRowIndex = 38
+    val stringResourceList = read(lan, getStringResourceFile(dir, lan))
+    for (stringResource in stringResourceList) {
+        when (stringResource) {
+            is SimpleStringResource -> {
+                for (excelRowIndex in excelStartRowIndex..excelEndRowIndex) {
+                    val nameFromExcel = reader.readString(sheetIndex, excelRowIndex, nameColumnIndex)
+                    if (stringResource.name == nameFromExcel) {
+                        val valueFromExcel = reader.readString(sheetIndex, excelRowIndex, valueColumnIndex)
+                        if (valueFromExcel != null) {
+                            insertOrUpdate(dir, lan, nameFromExcel, valueFromExcel)
+                        } else {
+                            println("Excel数据为NULL：name = $nameFromExcel, value = $valueFromExcel")
+                        }
+                        break
+                    }
+                }
+            }
+            is ArrayStringResource -> {
+                val valueArrFromExcel = arrayOfNulls<String>(stringResource.values.size)
+                stringResource.values.forEachIndexed { index, value ->
+                    for (excelRowIndex in excelStartRowIndex..excelEndRowIndex) {
+                        val nameFromExcel = reader.readString(sheetIndex, excelRowIndex, nameColumnIndex)
+                        if ("${stringResource.name}#$index" == nameFromExcel) {
+                            val valueFromExcel = reader.readString(sheetIndex, excelRowIndex, valueColumnIndex)
+                            if (valueFromExcel != null) {
+                                valueArrFromExcel[index] = valueFromExcel
+                            } else {
+                                println("Excel数据为NULL：name = $nameFromExcel, value = $valueFromExcel")
+                            }
+                            break
+                        }
+                    }
+                }
+                try {
+                    val valueArrFromExcelNoNull = valueArrFromExcel.requireNoNulls()
+                    insertOrUpdate(dir, lan, stringResource.name, valueArrFromExcelNoNull)
+                } catch (e: Exception) {
+                    println("Excel数据为NULL：name = ${stringResource.name}, values = $valueArrFromExcel")
+                }
+            }
+            else -> {
+                println("不支持的数据：$stringResource")
+            }
+        }
+    }
 }
 
 /**
